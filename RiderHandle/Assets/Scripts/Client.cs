@@ -44,9 +44,9 @@ public class Client : MonoBehaviour
     {
         public TcpClient socket;
 
-        private NetworkStream stream;
-        private Packet receivedData;
-        private byte[] receiveBuffer;
+        public NetworkStream stream;
+        public Packet receivedData;
+        public byte[] receiveBuffer;
 
         public void Connect()
         {
@@ -190,6 +190,10 @@ public class Client : MonoBehaviour
 
         public void Connect(int _localPort) //the users port number not the server
         {
+            if (endPoint == null)
+            {
+                endPoint = new IPEndPoint(IPAddress.Parse(instance.ip), instance.port);
+            }
             socket = new UdpClient(_localPort);
 
             socket.Connect(endPoint);
@@ -246,10 +250,16 @@ public class Client : MonoBehaviour
             if (tcp != null)
             {
                 tcp.socket.Close();
+                tcp.stream = null;
+                tcp.receivedData = null;
+                tcp.receiveBuffer = null;
+                tcp.socket = null;
             }
             if (udp != null)
             {
                 udp.socket.Close();
+                udp.endPoint = null;
+                udp.socket = null;
             }
 
             Debug.Log("Disconnected from server.");
